@@ -4,18 +4,13 @@
 import { shallow } from 'enzyme';
 
 /**
- * WordPress dependencies
- */
-import { getBlockType } from '@wordpress/blocks';
-
-/**
  * Internal dependencies
  */
 import { VisualEditorInserter } from '../inserter';
 
 describe( 'VisualEditorInserter', () => {
 	it( 'should show controls when receiving focus', () => {
-		const wrapper = shallow( <VisualEditorInserter /> );
+		const wrapper = shallow( <VisualEditorInserter frequentInserterItems={ [] } /> );
 
 		wrapper.simulate( 'focus' );
 
@@ -23,7 +18,7 @@ describe( 'VisualEditorInserter', () => {
 	} );
 
 	it( 'should hide controls when losing focus', () => {
-		const wrapper = shallow( <VisualEditorInserter /> );
+		const wrapper = shallow( <VisualEditorInserter frequentInserterItems={ [] } /> );
 
 		wrapper.simulate( 'focus' );
 		wrapper.simulate( 'blur' );
@@ -33,22 +28,23 @@ describe( 'VisualEditorInserter', () => {
 
 	it( 'should insert frequently used blocks', () => {
 		const onInsertBlock = jest.fn();
-		const mostFrequentlyUsedBlocks = [ getBlockType( 'core/paragraph' ), getBlockType( 'core/image' ) ];
+		const frequentInserterItems = [
+			{ name: 'core/paragraph', title: 'Paragraph' },
+			{ name: 'core/block', title: 'My block', initialAttributes: { ref: 123 } },
+		];
 		const wrapper = shallow(
-			<VisualEditorInserter onInsertBlock={ onInsertBlock } mostFrequentlyUsedBlocks={ mostFrequentlyUsedBlocks } />
+			<VisualEditorInserter onInsertBlock={ onInsertBlock } frequentInserterItems={ frequentInserterItems } />
 		);
-		wrapper.state.preferences = {
-			blockUsage: {
-				'core/paragraph': 42,
-				'core/image': 34,
-			},
-		};
 
 		wrapper
-			.findWhere( ( node ) => node.prop( 'children' ) === 'Paragraph' )
+			.findWhere( ( node ) => node.prop( 'children' ) === 'My block' )
 			.simulate( 'click' );
 
 		expect( onInsertBlock ).toHaveBeenCalled();
-		expect( onInsertBlock.mock.calls[ 0 ][ 0 ].name ).toBe( 'core/paragraph' );
+		expect( onInsertBlock.mock.calls[ 0 ][ 0 ] ).toMatchObject( {
+			uid: expect.any( String ),
+			name: 'core/block',
+			attributes: { ref: 123 },
+		} );
 	} );
 } );
