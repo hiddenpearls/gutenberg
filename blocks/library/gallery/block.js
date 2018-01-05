@@ -127,6 +127,15 @@ class GalleryBlock extends Component {
 		);
 	}
 
+	//deselect images when losing focus
+	componentWillReceiveProps( nextProps ) {
+		if ( ! nextProps.focus && this.props.focus ) {
+			this.setState( {
+				selectedImage: null,
+			} );
+		}
+	}
+
 	render() {
 		const { attributes, focus, className } = this.props;
 		const { images, columns = defaultColumnsNumber( attributes ), align, imageCrop, linkTo } = attributes;
