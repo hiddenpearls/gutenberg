@@ -4,15 +4,20 @@ services:
 
   wordpress:
     image: wordpress
+    build:
+      context: .
+      dockerfile: Dockerfile
     ports:
       - 8888:80
     environment:
       WORDPRESS_DB_PASSWORD: example
     volumes:
       - ../:/var/www/html/wp-content/plugins/gutenberg
+      - ./.tmp:/tmp
     container_name: wordpress-dev
 
   mysql:
     image: mysql:5.7
     environment:
       MYSQL_ROOT_PASSWORD: example
+      MYSQL_DATABASE: wordpress_test

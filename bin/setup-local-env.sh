@@ -6,6 +6,8 @@ set -e
 # Change to the expected directory
 cd "$(dirname "$0")/../docker"
 
+docker-compose build
+
 # Launch the WordPress docker
 docker-compose up -d
 
@@ -22,8 +24,5 @@ docker run -it --rm --volumes-from wordpress-dev --network container:wordpress-d
 # Activate Gutenberg
 docker run -it --rm --volumes-from wordpress-dev --network container:wordpress-dev wordpress:cli plugin activate gutenberg
 
-# Launch the PHPUnit docker
-docker-compose -f docker-compose.phpunit.yml up -d
-
-# Install the PHPUnit test scaffolding
-docker-compose -f docker-compose.phpunit.yml run --rm wordpress_phpunit /app/bin/install-wp-tests.sh wordpress_test root '' mysql_phpunit latest true
+# Install PHPUnit testing infrastructure
+docker-compose run --rm wordpress /var/www/html/wp-content/plugins/gutenberg/bin/install-wp-tests.sh wordpress_test root example mysql latest true
